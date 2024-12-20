@@ -1,4 +1,5 @@
 .env
 *.txt
-play*/
+txt/
+mp3/
 .cache

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
 from dataclasses import dataclass
+import shutil
 
 @dataclass
 class PlaylistTrack:
@@ -27,7 +28,6 @@ class SpotifyPlaylistExporter:
     def __init__(self):
         load_dotenv()
         self._setup_environment()
-        self.timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         self.folder_path = self._create_export_folder()
 
     def _setup_environment(self) -> None:
@@ -62,7 +62,11 @@ class SpotifyPlaylistExporter:
 
     def _create_export_folder(self) -> Path:
         """Create and return export folder path."""
-        folder_path = Path(__file__).parent / f'playlists_{self.timestamp}'
+        folder_path = Path(__file__).parent / 'txt'
+        # Remove the folder if it exists
+        if folder_path.exists():
+            shutil.rmtree(folder_path)
+        # Create new folder
         folder_path.mkdir(exist_ok=True)
         return folder_path
 
@@ -113,7 +117,8 @@ class SpotifyPlaylistExporter:
                 fields='name,owner.display_name,public,tracks.total'
             )
             playlist_name = self._sanitize_filename(playlist_details['name'])
-            filepath = self.folder_path / f"{playlist_name}_{self.timestamp}.txt"
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            filepath = self.folder_path / f"{playlist_name}_{timestamp}.txt"
 
             tracks = self._get_all_playlist_tracks(playlist['id'])
             
